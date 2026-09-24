@@ -1,0 +1,46 @@
+{
+  "projects": [
+    {
+      "name": "Atlas Migration",
+      "owner": "Maya Chen",
+      "status": "On track",
+      "recentActivity": "Completed the customer data mapping review and moved the first validation batch into staging.",
+      "priority": "High"
+    },
+    {
+      "name": "Northstar Mobile",
+      "owner": "Jordan Ellis",
+      "status": "Active",
+      "recentActivity": "The new onboarding flow is in usability testing with the first group of beta customers.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Signal Analytics",
+      "owner": "Priya Nair",
+      "status": "At risk",
+      "recentActivity": "A vendor data delay is affecting the reporting timeline; the team is evaluating a temporary backfill.",
+      "priority": "Critical"
+    },
+    {
+      "name": "Harbor Design System",
+      "owner": "Theo Martin",
+      "status": "Complete",
+      "recentActivity": "Version 3.2 shipped with updated form components and accessibility guidance.",
+      "priority": "Low"
+    },
+    {
+      "name": "Cedar Workspace",
+      "owner": "Avery Brooks",
+      "status": "Paused",
+      "recentActivity": "Discovery is paused while the team aligns the next-quarter capacity plan.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Relay API",
+      "owner": "Samira Okafor",
+      "status": "Blocked",
+      "recentActivity": "The production rollout is waiting on final security review and service-account approval.",
+      "priority": "High"
+    }
+  ]
+}

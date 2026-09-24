@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A calm, high-contrast overview of project delivery health.">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <div class="eyebrow">Operations overview</div>
+      <h1>Project Pulse</h1>
+      <p class="intro">A clear view of what is moving, what needs attention, and where teams are focusing next.</p>
+    </header>
+
+    <section class="projects-section" aria-labelledby="projects-heading">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">Team delivery</div>
+          <h2 id="projects-heading">Projects</h2>
+        </div>
+        <span class="section-count" id="project-count" aria-live="polite"></span>
+      </div>
+      <div class="dynamic-region" id="projects-region" aria-live="polite" aria-busy="true">
+        <div class="state-card loading-state">
+          <span class="loading-mark" aria-hidden="true"></span>
+          <p>Loading projects…</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var region = document.getElementById("projects-region");
+      var count = document.getElementById("project-count");
+      var statusLabels = {
+        active: "Active",
+        "on track": "On track",
+        "at risk": "At risk",
+        blocked: "Blocked",
+        paused: "Paused",
+        complete: "Complete"
+      };
+      var priorityLabels = {
+        high: "High",
+        medium: "Medium",
+        low: "Low",
+        critical: "Critical"
+      };
+
+      function createText(tagName, className, value) {
+        var element = document.createElement(tagName);
+        element.className = className;
+        element.textContent = value == null ? "Not provided" : String(value);
+        return element;
+      }
+
+      function normalizedKey(value) {
+        return String(value == null ? "" : value).trim().toLowerCase();
+      }
+
+      function createPill(label, value, type, knownValues) {
+        var key = normalizedKey(value);
+        var pill = document.createElement("span");
+        pill.className = "pill pill-" + type + " pill-" + (knownValues[key] ? key.replace(/\s+/g, "-") : "unknown");
+        pill.appendChild(createText("span", "pill-label", label));
+        pill.appendChild(createText("span", "pill-value", knownValues[key] || (value == null ? "Not provided" : value)));
+        return pill;
+      }
+
+      function renderProjects(projects) {
+        region.replaceChildren();
+        region.setAttribute("aria-busy", "false");
+        count.textContent = projects.length + (projects.length === 1 ? " project" : " projects");
+
+        if (!projects.length) {
+          var empty = document.createElement("div");
+          empty.className = "state-card empty-state";
+          empty.appendChild(createText("h3", "state-title", "No projects yet"));
+          empty.appendChild(createText("p", "", "Projects will appear here when they are added to the portfolio."));
+          region.appendChild(empty);
+          return;
+        }
+
+        var grid = document.createElement("div");
+        grid.className = "project-grid";
+        projects.forEach(function (project) {
+          var card = document.createElement("article");
+          card.className = "project-card";
+
+          var top = document.createElement("div");
+          top.className = "card-top";
+          top.appendChild(createText("h3", "project-name", project.name));
+          top.appendChild(createPill("Status", project.status, "status", statusLabels));
+          card.appendChild(top);
+
+          card.appendChild(createText("p", "owner", "Owner: " + (project.owner == null ? "Not provided" : project.owner)));
+
+          var activity = document.createElement("div");
+          activity.className = "activity";
+          activity.appendChild(createText("p", "detail-label", "Recent activity"));
+          activity.appendChild(createText("p", "activity-text", project.recentActivity));
+          card.appendChild(activity);
+
+          var footer = document.createElement("div");
+          footer.className = "card-footer";
+          footer.appendChild(createPill("Priority", project.priority, "priority", priorityLabels));
+          card.appendChild(footer);
+          grid.appendChild(card);
+        });
+        region.appendChild(grid);
+      }
+
+      function showError(message) {
+        region.replaceChildren();
+        region.setAttribute("aria-busy", "false");
+        count.textContent = "";
+        var error = document.createElement("div");
+        error.className = "state-card error-state";
+        error.appendChild(createText("h3", "state-title", "Projects unavailable"));
+        error.appendChild(createText("p", "", message));
+        region.appendChild(error);
+      }
+
+      fetch("project-data.json")
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("The project data could not be loaded.");
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          if (!data || !Array.isArray(data.projects)) {
+            throw new Error("The project data has an invalid format.");
+          }
+          renderProjects(data.projects);
+        })
+        .catch(function (error) {
+          showError(error.message || "Please try again later.");
+        });
+    }());
+  </script>
+</body>
+</html>
